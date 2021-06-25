@@ -1,0 +1,31 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "options": {
+        "env": {
+            "pass": "<sudo-password>",
+        }
+    },
+    "tasks": [
+        {
+            "label": "Init",
+            "type": "shell",
+            "command": "echo $pass | sudo -S pip3 install -r requirements.txt; sudo apt install hping3",
+            "problemMatcher": [],
+            "presentation": {
+                "clear": true
+            }
+        },
+        {
+            "label": "Run",
+            "type": "shell",
+            "command": "echo $pass | sudo -S python3 miniattack",
+            "problemMatcher": [],
+            "presentation": {
+                "focus": true,
+                "clear": true
+            },
+        }
+    ],
+}
