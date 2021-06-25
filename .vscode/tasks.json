@@ -11,7 +11,7 @@
         {
             "label": "Init",
             "type": "shell",
-            "command": "echo $pass | sudo -S pip3 install -r requirements.txt; sudo apt install hping3",
+            "command": "echo $pass | sudo -S pip3 install -r requirements.txt; sudo apt install -y hping3 bwm-ng",
             "problemMatcher": [],
             "presentation": {
                 "clear": true
