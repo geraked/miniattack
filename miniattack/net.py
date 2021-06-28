@@ -21,6 +21,7 @@ class Net:
         self.data = {}
 
     def run(self):
+        """Start simulation"""
         self.remove_tmp()
         self.clean_net()
         self.start_net()
@@ -37,11 +38,13 @@ class Net:
         self.plot()
 
     def clean_net(self):
+        """Clean mininet to allow to create new topology"""
         info('*** Clean net\n')
         cmd = "mn -c"
         Popen(cmd, shell=True).wait()
 
     def start_net(self):
+        """Build the topology and initialize the network"""
         self.net = Mininet(FatTree())
         self.net.start()
         for i in range(1, 11):
@@ -54,19 +57,23 @@ class Net:
         self.net.pingAll()
 
     def stop_net(self):
+        """Stop mininet with current network"""
         self.net.stop()
 
     def start_monitor(self):
+        """Run bwm-ng in background to measure network load and write to a file"""
         info('*** Start monitor\n')
         cmd = f"bwm-ng -o csv -T rate -C ',' > {self.tmp} &"
         Popen(cmd, shell=True).wait()
 
     def stop_monitor(self):
+        """Kill all running instances of bwm-ng"""
         info('*** Stop monitor\n')
-        cmd = "killall -9 top bwm-ng"
+        cmd = "killall bwm-ng"
         Popen(cmd, shell=True).wait()
 
     def start_attack(self):
+        """Attack from h1,h5 to h2,h3,h7,h8 by running instances of hping3 in background"""
         info('*** Start attack\n')
         h1 = self.net.get('h1')
         h5 = self.net.get('h5')
@@ -80,12 +87,14 @@ class Net:
         h5.cmd(f"hping3 {self.opt1} {self.opt2} {ip8} &")
 
     def stop_attack(self):
+        """Kill all running instances of hping3"""
         info('*** Stop attack\n')
-        cmd = "killall -9 top hping3"
+        cmd = "killall hping3"
         Popen(cmd, shell=True).wait()
 
     def fill_data(self):
-        with open('tmp.txt') as csvf:
+        """Read the output of bwm-ng from a file"""
+        with open(self.tmp) as csvf:
             csvr = csv.reader(csvf, delimiter=',')
             for row in csvr:
                 key = row[1]
@@ -96,14 +105,17 @@ class Net:
                     self.data[key] = []
 
     def plot(self):
+        """Pass the loaded output of bwm-ng to gui to plot"""
         info('*** Plot\n')
         gui(self.data)
 
     def remove_tmp(self):
+        """Remove the output file of bwm-ng if already exists"""
         if os.path.exists(self.tmp):
             os.remove(self.tmp)
 
     def stop_all(self):
+        """Kill all running instances of hping3, bwm-ng and stop the net"""
         try:
             self.stop_attack()
             self.stop_monitor()
@@ -114,6 +126,7 @@ class Net:
 
 
 def main():
+    """Run the script"""
     setLogLevel('info')
     opt1 = sys.argv[1] if len(sys.argv) > 1 else '--flood'
     opt2 = sys.argv[2] if len(sys.argv) > 2 else '--udp'
