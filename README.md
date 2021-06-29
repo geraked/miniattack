@@ -14,13 +14,20 @@ View the topology on [Mininet-Topology-Visualizer](http://demo.spear.narmox.com/
 
 ### Usage
 ```
-sudo python3 miniattack <option-1> <option-2>
+sudo python3 miniattack <option-1> <option-2> <interfaces>
 ```
 For the options, you can set any supported options of `hping3`. See `hping3 -h` for more information.
 
-#### Sample:
+After setting options, you can declare the name of the interfaces which want to be displayed. If no interface is declared, all of them will be displayed.
+
+#### Sample 1:
 ```
 sudo python3 miniattack --flood --udp
+```
+
+#### Sample 2:
+```
+sudo python3 miniattack --flood --udp s1-eth1 s1-eth2
 ```
 
 ## Author
