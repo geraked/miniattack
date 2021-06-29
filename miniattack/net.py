@@ -108,6 +108,7 @@ class Net:
     def plot(self):
         """Pass the loaded output of bwm-ng to gui to plot"""
         info('*** Plot\n')
+        self.itfs = [t for t in self.itfs if t in self.data]
         gui(self.data, self.itfs)
 
     def remove_tmp(self):
