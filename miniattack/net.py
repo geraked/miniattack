@@ -12,12 +12,13 @@ from topo import FatTree
 
 
 class Net:
-    def __init__(self, opt1='--flood', opt2='--udp'):
+    def __init__(self, opt1='--flood', opt2='--udp', itfs=[]):
         self.idle_dur = 5
         self.attack_dur = 5
         self.tmp = 'tmp.txt'
         self.opt1 = opt1
         self.opt2 = opt2
+        self.itfs = itfs
         self.data = {}
 
     def run(self):
@@ -107,7 +108,7 @@ class Net:
     def plot(self):
         """Pass the loaded output of bwm-ng to gui to plot"""
         info('*** Plot\n')
-        gui(self.data)
+        gui(self.data, self.itfs)
 
     def remove_tmp(self):
         """Remove the output file of bwm-ng if already exists"""
@@ -130,7 +131,8 @@ def main():
     setLogLevel('info')
     opt1 = sys.argv[1] if len(sys.argv) > 1 else '--flood'
     opt2 = sys.argv[2] if len(sys.argv) > 2 else '--udp'
-    n = Net(opt1, opt2)
+    itfs = sys.argv[3:] if len(sys.argv) > 3 else []
+    n = Net(opt1, opt2, itfs)
     try:
         n.run()
     except KeyboardInterrupt:

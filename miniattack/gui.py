@@ -16,14 +16,23 @@ def draw_figure(canvas, figure):
     return figure_canvas_agg
 
 
-def gui(data):
-    cols = 4
-    rowspan = 5
-    rows = math.ceil(len(data) / cols) + rowspan
+def gui(data, itfs=[]):
+    if len(itfs) == 0 or len(itfs) >= 8:
+        cols = 4
+        rowspan = 5
+    else:
+        cols = 1
+        rowspan = 2
+    if len(itfs) == 0:
+        rows = math.ceil(len(data) / cols) + rowspan
+    else:
+        rows = math.ceil(len(itfs) / cols) + rowspan
     index = cols * rowspan
 
     plt.figure(1)
+    print(itfs)
 
+    # Show topology image
     imp = path.join(path.dirname(__file__), '..', 'docs', 'topo.jpg')
     imp = path.abspath(imp)
     img = mpimg.imread(imp)
@@ -33,6 +42,8 @@ def gui(data):
 
     i = index + 1
     for k in sorted(data):
+        if len(itfs) > 0 and k not in itfs:
+            continue
         plt.subplot(rows, cols, i)
         y = data[k]
         x = [str(t) for t in range(len(y))]
