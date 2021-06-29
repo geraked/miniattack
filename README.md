@@ -28,7 +28,7 @@ sudo python3 miniattack --flood --udp
 
 ## Details
 - **Course:** Internet Engineering - Undergraduate
-- **Teacher:** [Mehran Shetabi](https://yazd.ac.ir/people/shetabi)
+- **Teacher:** [Dr. Mehran Shetabi](https://yazd.ac.ir/en/people/shetabi)
 - **Univ:** Yazd University
 - **Semester:** Spring 1400
 
