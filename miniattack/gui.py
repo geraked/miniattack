@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import PySimpleGUI as sg
 from os import path
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_pdf import PdfPages
+
 
 matplotlib.use('TkAgg')
 
@@ -17,20 +19,26 @@ def draw_figure(canvas, figure):
 
 
 def gui(data, itfs=[]):
+    # Calculate dynamic size
     if len(itfs) == 0 or len(itfs) >= 8:
         cols = 4
-        rowspan = 5
+        rowspan = 3
+        hsmooth = 2.5
     else:
         cols = 1
-        rowspan = 2
+        rowspan = 1
+        hsmooth = 5.0
+
     if len(itfs) == 0:
         rows = math.ceil(len(data) / cols) + rowspan
     else:
         rows = math.ceil(len(itfs) / cols) + rowspan
+
+    width = 13.0
+    height = hsmooth * rows
     index = cols * rowspan
 
     plt.figure(1)
-    print(itfs)
 
     # Show topology image
     imp = path.join(path.dirname(__file__), '..', 'docs', 'topo.jpg')
@@ -40,6 +48,7 @@ def gui(data, itfs=[]):
     plt.imshow(img)
     plt.axis('off')
 
+    # Plot interfaces
     i = index + 1
     for k in sorted(data):
         if len(itfs) > 0 and k not in itfs:
@@ -53,9 +62,17 @@ def gui(data, itfs=[]):
         plt.xticks([])
         i += 1
 
+    # Configure layout
     fig = plt.gcf()
-    fig.set_size_inches(13, 20)
+    fig.set_size_inches(width, height)
     fig.tight_layout()
+
+    # Save plot as pdf
+    pdp = path.join(path.dirname(__file__), '..', 'plot.pdf')
+    pdp = path.abspath(pdp)
+    pp = PdfPages(pdp)
+    pp.savefig()
+    pp.close()
 
     layout = [
         [sg.Column([[sg.Canvas(key='-C1-')]], key='-COL1-', scrollable=True)],
