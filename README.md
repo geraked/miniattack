@@ -30,6 +30,8 @@ sudo python3 miniattack --flood --udp
 sudo python3 miniattack --flood --udp s1-eth1 s1-eth2
 ```
 
+Every time the program runs, the resulting plot will be saved as pdf with the name `plot.pdf` in the same directory.
+
 ## Author
 **Rabist** - view on [LinkedIn](https://www.linkedin.com/in/rabist)
 
