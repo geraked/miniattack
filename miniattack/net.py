@@ -2,7 +2,7 @@ import sys
 import os
 import csv
 from subprocess import Popen
-from time import sleep
+from time import sleep, time
 from mininet.log import setLogLevel, info
 from mininet.net import Mininet
 from mininet.util import dumpNodeConnections
@@ -29,8 +29,10 @@ class Net:
         self.start_monitor()
         sleep(self.idle_dur)
         self.start_attack()
+        self.ast = time()
         sleep(self.attack_dur)
         self.stop_attack()
+        self.aet = time()
         sleep(self.idle_dur)
         self.stop_monitor()
         self.fill_data()
@@ -99,17 +101,21 @@ class Net:
             csvr = csv.reader(csvf, delimiter=',')
             for row in csvr:
                 key = row[1]
-                value = float(row[4]) * 8
+                tme = float(row[0])
+                load = float(row[4]) * 8
                 if key in self.data:
-                    self.data[key].append(value)
+                    self.data[key]['time'].append(tme)
+                    self.data[key]['load'].append(load)
                 else:
-                    self.data[key] = []
+                    self.data[key] = {}
+                    self.data[key]['time'] = []
+                    self.data[key]['load'] = []
 
     def plot(self):
         """Pass the loaded output of bwm-ng to gui to plot"""
         info('*** Plot\n')
         self.itfs = [t for t in self.itfs if t in self.data]
-        gui(self.data, self.itfs)
+        gui(self.data, (self.ast, self.aet), self.itfs)
 
     def remove_tmp(self):
         """Remove the output file of bwm-ng if already exists"""
