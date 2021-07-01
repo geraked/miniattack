@@ -1,29 +1,48 @@
+import datetime as dt
 import math
+from os import path
 import matplotlib
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import PySimpleGUI as sg
-from os import path
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_pdf import PdfPages
-
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.ticker import FuncFormatter
 
 matplotlib.use('TkAgg')
 
 
 def draw_figure(canvas, figure):
-    figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
-    figure_canvas_agg.draw()
-    figure_canvas_agg.get_tk_widget().pack(side='top', fill='both', expand=1)
-    return figure_canvas_agg
+    """Draw a figure in canvas for PySimpleGUI"""
+    fca = FigureCanvasTkAgg(figure, canvas)
+    fca.draw()
+    fca.get_tk_widget().pack(side='top', fill='both', expand=1)
+    return fca
+
+
+def format_x(n, pos):
+    """Format representation of xticks with hours:minutes:seconds"""
+    t = dt.datetime.fromtimestamp(n)
+    return t.strftime("%H:%M:%S")
+
+
+def format_y(n, pos):
+    """Format representation of yticks with K,M metric prefixes"""
+    if n >= 1e6:
+        return '%1.0fM' % (n * 1e-6)
+    if n >= 1e3:
+        return '%1.0fK' % (n * 1e-3)
+    return '%1.0f' % n
 
 
 def gui(data, attack_range, itfs=[]):
+    """Plot data and embed the figure in PySimpleGUI"""
+
     # Calculate dynamic size
     if len(itfs) == 0 or len(itfs) >= 8:
-        cols = 4
-        rowspan = 3
-        hsmooth = 2.5
+        cols = 3
+        rowspan = 2
+        hsmooth = 3.0
     else:
         cols = 1
         rowspan = 1
@@ -53,14 +72,24 @@ def gui(data, attack_range, itfs=[]):
     for k in sorted(data):
         if len(itfs) > 0 and k not in itfs:
             continue
+
         plt.subplot(rows, cols, i)
         y = data[k]['load']
         x = data[k]['time']
         plt.plot(x, y)
         plt.title(k)
         plt.ylabel('bits/s')
+
+        # Highlight attack range
         plt.axvspan(*attack_range, color='red', alpha=0.1)
-        plt.xticks([])
+
+        # Format axis
+        ax = plt.gca()
+        ax.xaxis.set_major_formatter(FuncFormatter(format_x))
+        ax.yaxis.set_major_formatter(FuncFormatter(format_y))
+        plt.setp(ax.get_xticklabels(), rotation=30,
+                 horizontalalignment='right')
+
         i += 1
 
     # Configure layout
@@ -77,7 +106,8 @@ def gui(data, attack_range, itfs=[]):
 
     # Confiure PySimpleGUI
     layout = [
-        [sg.Column([[sg.Canvas(key='-C1-')]], key='-COL1-', scrollable=True)],
+        [sg.Column([[sg.Canvas(key='-C1-')]], key='-COL1-',
+                   scrollable=True, vertical_scroll_only=True)],
     ]
     window = sg.Window(
         'Mininet Attack Test',
